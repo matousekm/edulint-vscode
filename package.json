@@ -4,7 +4,7 @@
   "description": "EduLint VS Code Extension for students at the Faculty of Informatics, Masaryk Uni",
   "icon": "assets/icon.png",
   "publisher": "matousekm",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.82.0"
   },
