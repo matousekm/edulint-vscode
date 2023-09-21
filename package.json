@@ -8,6 +8,7 @@
   "engines": {
     "vscode": "^1.82.0"
   },
+  "license": "gpl-3.0",
   "categories": [
     "Linters"
   ],
