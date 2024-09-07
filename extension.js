@@ -22,7 +22,7 @@ function activate(context) {
     }
 
     terminal.sendText(
-      `python3 -m edulint ${vscode.window.activeTextEditor.document.uri.path}`
+      `python3 -m edulint check ${vscode.window.activeTextEditor.document.uri.path}`
     )
   })
 
