@@ -1,7 +1,7 @@
 {
   "name": "edulint-vscode",
   "displayName": "EduLint",
-  "description": "EduLint VS Code Extension for students at the Faculty of Informatics, Masaryk Uni",
+  "description": "EduLint VS Code Extension for students at the Faculty of Informatics, Masaryk University",
   "icon": "assets/icon.png",
   "publisher": "matousekm",
   "version": "0.2.0",
@@ -33,6 +33,7 @@
     "pretest": "npm run lint",
     "test": "node ./test/runTest.js"
   },
+  "extensionDependencies": ["ms-python.python"],
   "devDependencies": {
     "@types/vscode": "^1.82.0",
     "@types/mocha": "^10.0.1",

@@ -3,8 +3,21 @@ const vscode = require('vscode')
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+async function activate(context) {
+  const pythonExtension = vscode.extensions.getExtension('ms-python.python')
+  if (!pythonExtension) {
+    vscode.window.showErrorMessage('Python extension not found. Please install it.')
+    return
+  }
+  if (!pythonExtension.isActive) {
+    await pythonExtension.activate()
+  }
+  const pythonPath = await getPythonInterpreter()
   let disposable = vscode.commands.registerCommand('edulint.lint', function () {
+    if (!pythonPath) {
+      vscode.window.showErrorMessage('Python interpreter not found. Please configure Python in your workspace.')
+      return
+    }
     // check for already existing terminals
     const terminalMatchIndex = vscode.window.terminals.findIndex(
       (terminal) => terminal.name === 'edulint terminal'
@@ -16,13 +29,14 @@ function activate(context) {
       terminal = vscode.window.terminals[terminalMatchIndex]
     }
     terminal.show()
-
-    if (vscode.window.activeTextEditor.document.uri.path.slice(-3) !== '.py') {
-      vscode.window.showErrorMessage('Please run this command in a .py file')
+    const activeEditor = vscode.window.activeTextEditor
+    if (!activeEditor || activeEditor.document.languageId !== 'python') {
+      vscode.window.showErrorMessage('Please run this command in a Python file (.py)')
+      return
     }
-
+    const filePath = activeEditor.document.uri.fsPath
     terminal.sendText(
-      `python3 -m edulint check ${vscode.window.activeTextEditor.document.uri.path}`
+      `${pythonPath} -m edulint check "${filePath}"`
     )
   })
 
@@ -37,6 +51,16 @@ function activate(context) {
   button.show()
 
   context.subscriptions.push(button)
+}
+
+async function getPythonInterpreter() {
+  const pythonExtension = vscode.extensions.getExtension('ms-python.python')
+  if (pythonExtension && pythonExtension.exports) {
+    const pythonAPI = pythonExtension.exports
+    const pythonPath = await pythonAPI.settings.getExecutionDetails()
+    return pythonPath.execCommand[0] || null
+  }
+  return null
 }
 
 function deactivate() {}
