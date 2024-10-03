@@ -50,16 +50,6 @@ async function activate(context) {
 
   context.subscriptions.push(disposable)
 
-  const button = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Right
-  )
-  button.text = '$(eye) EduLint' // You can customize the text and icon
-  button.tooltip = 'Run EduLint'
-  button.command = 'edulint.lint' // The command defined in package.json
-  button.show()
-
-  context.subscriptions.push(button)
-
   let diagnosticCollection = vscode.languages.createDiagnosticCollection('edulint')
   context.subscriptions.push(diagnosticCollection)
 
