@@ -2,10 +2,16 @@ const vscode = require('vscode')
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
 
+/** @type {vscode.LogOutputChannel} */
+let log = null
+
 /**
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
+  log = vscode.window.createOutputChannel('edulint', {log: true})
+  log.info('Activating EduLint extension')
+
   const pythonExtension = vscode.extensions.getExtension('ms-python.python')
   if (!pythonExtension) {
     vscode.window.showErrorMessage('Python extension not found. Please install it.')
@@ -103,7 +109,12 @@ async function updateDiagnosticCollection(doc, diagCollection) {
   }
 
   const diagnostics = []
+
+  log.info(`Linting ${doc.fileName}`)
   const outp = await getEdulintOutput(doc.fileName)
+  log.info(`Finished linting ${doc.fileName}, found ${outp.problems.length} problems`)
+  log.debug(outp)
+
   const problems = outp.problems
   
   for (const problem of problems) {
@@ -133,7 +144,7 @@ async function updateDiagnosticCollection(doc, diagCollection) {
 async function getEdulintOutput(filePath) {
   const pythonPath = await getPythonInterpreter()
   if (!pythonPath) {
-    vscode.window.showErrorMessage('Python interpreter not found. Please configure Python in your workspace.')
+    log.error("python interpreter not set")
     return
   }
 
@@ -144,7 +155,10 @@ async function getEdulintOutput(filePath) {
     out.stdout = err.stdout
     out.stderr = err.stderr
   }
-  
+  if (out.stderr !== '') {
+    log.error(out.stderr)
+  }
+
   return JSON.parse(out.stdout)
 }
 
